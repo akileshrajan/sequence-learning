@@ -155,5 +155,5 @@ if __name__ == "__main__":
 	s = initialize(f)
 	time.sleep(3)
 	s.start()
-    	time.sleep(5)
+	time.sleep(5)
 	s.stop()

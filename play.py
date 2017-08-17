@@ -9,7 +9,8 @@ import os
 import muse_pyliblo_server as mps
 import matplotlib.pyplot as plt
 import gc
-import random 
+import random
+
 
 # initialize random seed
 random.seed(time.time())
