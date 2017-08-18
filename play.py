@@ -17,7 +17,7 @@ random.seed(time.time())
 
 # NAO parameters
 ROBOT_IP = "129.107.119.134" # ethernet
-ROBOT_IP = "169.254.228.115"
+ROBOT_IP = "192.168.1.12"
 
 tts = ALProxy("ALTextToSpeech", ROBOT_IP, 9559)
 memory = ALProxy("ALMemory", ROBOT_IP, 9559)
@@ -103,7 +103,7 @@ ps = 0
 
 total_score = 0 
 previous_score = 0 
-#out = open(dirname + "/output", 'w')
+out = open(dirname + "/output", 'w')
 log = open(dirname + "/state_EEG", 'a')
 log2 = open(dirname + "/logfile", 'a')
 server = mps.initialize(out)
