@@ -16,12 +16,12 @@ import random
 random.seed(time.time())
 
 # NAO parameters
-ROBOT_IP = "129.107.119.134" # ethernet
+#ROBOT_IP = "129.107.119.134" # ethernet
 ROBOT_IP = "192.168.1.12"
 
-tts = ALProxy("ALTextToSpeech", ROBOT_IP, 9559)
-memory = ALProxy("ALMemory", ROBOT_IP, 9559)
-aup = ALProxy("ALAudioPlayer", ROBOT_IP, 9559)
+tts = ALProxy("ALTextToSpeech", ROBOT_IP, 9559)  ## For robot to say the text mentioned
+#memory = ALProxy("ALMemory", ROBOT_IP, 9559)
+aup = ALProxy("ALAudioPlayer", ROBOT_IP, 9559)   ## For Robot to play the audio mentioned
 
 
 # user info and folders
@@ -34,7 +34,7 @@ else:
 	session_id = 1
 
 os.makedirs(user_folder + "session_" + str(session_id)) 
-intro = open(user_folder + "session_" + str(session_id) + "/intro", 'w')
+intro = open(user_folder + "session_" + str(session_id) + "/intro", 'w')	## Writes an Intro File (currently empty hence commented)
 server = mps.initialize(intro)
 server.start()
 
@@ -87,79 +87,85 @@ s = 0
 correct = 0 
 total = 0 
 
-D = [3,5,7,9]
-L = ('a','b','c')
+diff = [3,5,7,9]    # Difficulty level 3,5,7,9 characters of the letters
+let = ('a','b','c') # Letters that form the sequence
 Actions = ["Easy", "Medium", "Hard", "Positive Feedback", "Negative Feedback"]
 
-dirname = 'data/user_' + user + '/session_' +  str(session_id) + '/' 
+dir_name = 'data/user_' + user + '/session_' +  str(session_id) + '/'
 turn = 1
 game = 1
 
 # 10 sequences of predefined actions for data collection -- maybe find a more formal way to define actions -- e.g., distribution etc.
-action_seqs = [[1,2,4,3,3,5,2,1,0,2,3,5,3,4,2,1,2,3,5,1,4,1,0,3,5], [0,0,2,4,2,3,5,3,2,4,1,1,4,2,3,5,2,1,4,2,1,3,5,4,1], [2,3,4,1,1,2,5,2,1,0,4,1,5,2,4,3,5,3,2,2,1,1,3,5,4], 				      [2,2,5,3,1,4,1,0,5,3,4,2,1,0,4,1,1,3,5,3,1,0,2,2,4], [2,4,3,2,4,2,1,5,0,4,0,1,5,2,2,1,4,2,3,5,4,2,3,5,3], [2,3,5,3,1,4,0,1,0,4,1,1,3,5,4,1,0,2,3,4,5,2,1,4,2], [0,1,2,4,3,2,5,3,1,4,1,0,3,5,2,3,5,1,2,3,4,2,1,3,4], [1,0,1,4,2,3,5,3,2,0,4,1,5,2,1,0,5,2,3,4,2,3,3,4,3], [1,2,5,2,4,3,2,5,1,0,4,1,2,5,3,2,5,1,2,4,2,3,4,1,1], [1,2,2,4,3,0,1,5,2,4,3,5,3,2,2,1,1,2,4,3,2,5,1,2,3], [0,1,2,3,4,3,5,1,2,3,4,3,2,0,1,2,3,4,3,2,2,3,3,4,2], [0,1,2,5,1,0,2,3,3,4,3,2,1,0,2,3,5,2,3,5,2,4,3,2,3]]
+action_seqs = [[1,2,4,3,3,5,2,1,0,2,3,5,3,4,2,1,2,3,5,1,4,1,0,3,5], [0,0,2,4,2,3,5,3,2,4,1,1,4,2,3,5,2,1,4,2,1,3,5,4,1], [2,3,4,1,1,2,5,2,1,0,4,1,5,2,4,3,5,3,2,2,1,1,3,5,4],
+			   [2,2,5,3,1,4,1,0,5,3,4,2,1,0,4,1,1,3,5,3,1,0,2,2,4], [2,4,3,2,4,2,1,5,0,4,0,1,5,2,2,1,4,2,3,5,4,2,3,5,3], [2,3,5,3,1,4,0,1,0,4,1,1,3,5,4,1,0,2,3,4,5,2,1,4,2],
+			   [0,1,2,4,3,2,5,3,1,4,1,0,3,5,2,3,5,1,2,3,4,2,1,3,4], [1,0,1,4,2,3,5,3,2,0,4,1,5,2,1,0,5,2,3,4,2,3,3,4,3], [1,2,5,2,4,3,2,5,1,0,4,1,2,5,3,2,5,1,2,4,2,3,4,1,1],
+			   [1,2,2,4,3,0,1,5,2,4,3,5,3,2,2,1,1,2,4,3,2,5,1,2,3], [0,1,2,3,4,3,5,1,2,3,4,3,2,0,1,2,3,4,3,2,2,3,3,4,2], [0,1,2,5,1,0,2,3,3,4,3,2,1,0,2,3,5,2,3,5,2,4,3,2,3]]
 
 actions = action_seqs[randint(0,10)]
 ps = 0 
 
 total_score = 0 
 previous_score = 0 
-out = open(dirname + "/output", 'w')
-log = open(dirname + "/state_EEG", 'a')
-log2 = open(dirname + "/logfile", 'a')
+out = open(dir_name + "/output", 'w')
+log_eeg = open(dir_name + "/state_EEG", 'a')
+log_session = open(dir_name + "/logfile", 'a')
 server = mps.initialize(out)
 server.start()
 
 while (turn<=len(actions)): 	
-	if not os.path.exists(dirname):
-		os.makedirs(dirname) 
+	if not os.path.exists(dir_name):
+		os.makedirs(dir_name)
 		
 	response = []
 	res = []
-	rf = 0
+	rf = 0 ## Robot feedback.
 
 	# select action from predefined
 	action = actions[turn-1]
 
 	## record EEG signals when robot announces the sequence ##
-	out = open(dirname + "/robot_" + str(turn), 'w')
+	out = open(dir_name + "/robot_" + str(turn), 'w')
 	server.f = out 
 	##########################################################
 
 	if action == 4: 
 		rf = 1
-		seq = list(np.random.choice(L, Dold))
+		seq = list(np.random.choice(let, Dold))
 	elif action == 5: 
 		rf = 2
-		seq = list(np.random.choice(L, Dold))
+		seq = list(np.random.choice(let, Dold))
 	else: 
-		seq = list(np.random.choice(L, D[action]))
-		Dold = D[action]
+		seq = list(np.random.choice(let, diff[action]))
+		Dold = diff[action]
 
 	length = len(seq)
 	
-	r = randint(0,2)
+	feedback_id = randint(0,2)
+	## Detetrmines if previous user action is success or not and accordingly chooses feedback type.
+    ## What statement said is chosen randomly. In the above line "feedback_id"
 	if rf == 1: 
 		if previous_success == 1: 
-			tts.say(positive_success[r])
+			tts.say(positive_success[feedback_id])
 		else: 
-			tts.say(positive_failure[r])
+			tts.say(positive_failure[feedback_id])
 
 	if rf == 2: 
 		if previous_success == 1: 
-			tts.say(negative_success[r])
+			tts.say(negative_success[feedback_id])
 		else: 
-			tts.say(negative_failure[r])
+			tts.say(negative_failure[feedback_id])
 
+	## Loop to say the sequence of charecters
 	for item in seq:
 		time.sleep(0.8)
 		tts.say(item)
 
-	aup.playSine(1000, 100, 0, 1)
+	aup.playSine(1000, 100, 0, 1)       ## play beep sound for user to respond.
 
 	time.sleep(1)
 
 	## record EEG signals when user presses the buttons ##
-	out = open(dirname + "/user_" + str(turn), 'w')
+	out = open(dir_name + "/user_" + str(turn), 'w')
 	server.f = out
 	######################################################
 
@@ -180,17 +186,17 @@ while (turn<=len(actions)):
 	completion_time = time.time() - start_time
 	if seq != res:
 		success = -1
-		score = -1*(D.index(length)+1)
+		score = -1*(diff.index(length)+1)
 	else: 
 		success = 1
-		score = D.index(length) + 1
+		score = diff.index(length) + 1
 		correct += 1
 	#################################################################################
 
 	dataline = str(length) + ' ' + str(rf) + ' ' + str(previous_score) + ' robot_' + str(turn) + ' human_' + str(turn) + '\n'	
-	log.write(dataline)
+	log_eeg.write(dataline)
 	dataline = str(turn) + ' ' + str(length) + ' ' + str(rf) + ' ' + str(score) + ' ' + str(success) + ' ' + str(reaction_time) + ' ' + str(completion_time) + ' ' + str(seq) + ' ' + str(res) + '\n'
-	log2.write(dataline)
+	log_session.write(dataline)
 
 	previous_success = success
 	previous_score = score
@@ -200,8 +206,8 @@ while (turn<=len(actions)):
 	turn += 1
 		
 out.close()
-log.close()	
-log2.close()
+log_eeg.close()
+log_session.close()
 server.stop()
 
 tts.say("That's the end of our session! Thank you for your time!! Hope to see you again!!!")
